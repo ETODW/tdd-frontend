@@ -2,7 +2,7 @@
   <a-table
       :columns="columns"
       :rowKey="record => record.added"
-      :dataSource="videoRecords"
+      :dataSource="videoRecordsWithSpeed"
       :pagination="pagination"
       :scroll="{ x: 700 }"
       size="small"
@@ -37,6 +37,9 @@
             title: '播放',
             dataIndex: 'view',
           }, {
+            title: '播放小时增速',
+            dataIndex: 'speed',
+          }, {
             title: '弹幕',
             dataIndex: 'danmaku',
           }, {
@@ -61,6 +64,19 @@
           showQuickJumper: true,
           showTotal: total => `共 ${total} 条记录`
         }
+      }
+    },
+    computed: {
+      videoRecordsWithSpeed: function () {
+        let list = [];
+        for (let i = 1; i < this.videoRecords.length; i++) {
+          let view_diff = this.videoRecords[i].view - this.videoRecords[i - 1].view;
+          let added_diff = this.videoRecords[i].added - this.videoRecords[i - 1].added;
+          let record = this.videoRecords[i];
+          record.speed = Math.round(view_diff / added_diff * 60 * 60); // view per hour
+          list.push(record);
+        }
+        return list;
       }
     }
   }
